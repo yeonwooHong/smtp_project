@@ -16,6 +16,8 @@ class EmailRecord(models.Model):
     body = models.TextField()
     # Automatically set to the current date/time when the record is first created
     sent_at = models.DateTimeField(auto_now_add=True)
+    # Path to attached file
+    filename = models.CharField(max_length=255, blank=True, null=True)
     # Email delivery status (e.g., "sent", "failed"); optional
     status = models.CharField(max_length=20, null=True, blank=True)
 

@@ -38,7 +38,7 @@ def main():
 
             # Send the email and save it to the database
             mailer.send_email(sender, password, receivers, cc, bcc, subject, body, attachment)
-            database.save_email(sender, receivers, subject, body, cc, bcc)
+            database.save_email(sender, receivers, subject, body, cc, bcc, filename=attachment)
 
         elif choice == "2":
             # Retrieve and display all sent emails from the database

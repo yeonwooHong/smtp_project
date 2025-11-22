@@ -17,7 +17,7 @@ def init_db():
     print("Django DB ready (run migrations if not done yet)")
 
 # Save an email record to the Django database.
-def save_email(sender, receivers, subject, body, cc=None, bcc=None):
+def save_email(sender, receivers, subject, body, cc=None, bcc=None, filename=None):
 
     # Convert lists of recipients into comma-separated strings
     receivers_str = ", ".join(receivers) if isinstance(receivers, list) else receivers
@@ -32,6 +32,7 @@ def save_email(sender, receivers, subject, body, cc=None, bcc=None):
         bcc=bcc_str,
         subject=subject,
         body=body,
+        filename=filename,
         status = 'sent'
     )
     record.save()
@@ -46,7 +47,6 @@ def get_all_emails():
 def get_email_by_id(email_id):
 
     # Retrieve a single email record by its ID.
-
     try:
         return EmailRecord.objects.get(id=email_id)
     except EmailRecord.DoesNotExist:

@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from os.path import basename
 
+# Send an email using the provided sender credentials and recipient lists.
 def send_email(email_sender, app_password, receiver_emails, cc_emails=None, bcc_emails=None, subject="", body="", filename=None):
     # Ensure all are lists
     if not isinstance(receiver_emails, list):
