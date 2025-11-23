@@ -1,6 +1,7 @@
 from email_sender import mailer, database, auth
 from email_sender.colors import Colors
 import getpass
+import smtplib
 
 def menu():
     # Display the main menu options for the Email Sender program.
@@ -51,26 +52,56 @@ def main():
                 print("You must be logged in to send an email.")
                 continue
 
-            # collect email details 
-            sender = auth.current_user.email
-            password = getpass.getpass("Enter your app password: ")
-            
-            # Parse comma-separated input into clean lists (ignore empty entries)
-            receivers = [x.strip() for x in input("Enter receiver emails (comma separated): ").split(',') if x.strip()]
-            cc = [x.strip() for x in input("Enter CC emails (comma separated, optional): ").split(',') if x.strip()]
-            bcc = [x.strip() for x in input("Enter BCC emails (comma separated, optional): ").split(',') if x.strip()]
+            try:
+                # collect email details 
+                sender = auth.current_user.email
+                password = getpass.getpass("Enter your Gmail App Password: ").strip()
+                
+                # Validate app password is provided
+                if not password:
+                    print(f"{Colors.RED}Error: App password cannot be empty. Please try again.{Colors.END}\n")
+                    continue
+                
+                # Parse comma-separated input into clean lists (ignore empty entries)
+                receivers = [x.strip() for x in input("Enter receiver emails (comma separated): ").split(',') if x.strip()]
+                
+                # Validate receivers are provided
+                if not receivers:
+                    print(f"{Colors.RED}Error: At least one receiver email is required.{Colors.END}\n")
+                    continue
+                
+                cc = [x.strip() for x in input("Enter CC emails (comma separated, optional): ").split(',') if x.strip()]
+                bcc = [x.strip() for x in input("Enter BCC emails (comma separated, optional): ").split(',') if x.strip()]
 
-            subject = input("Enter subject: ")
-            body = input("Enter body: ")
+                subject = input("Enter subject: ").strip()
+                
+                # Validate subject is provided
+                if not subject:
+                    print(f"{Colors.RED}Error: Subject cannot be empty.{Colors.END}\n")
+                    continue
+                
+                body = input("Enter body: ").strip()
+                
+                # Optional file attachment
+                attachment = input("Enter file path (or press Enter to skip): ").strip()
+                if not attachment:
+                    attachment = None
 
-            # Optional file attachment
-            attachment = input("Enter file path (or press Enter to skip): ").strip()
-            if not attachment:
-                attachment = None
-
-            # Send the email and save it to the database
-            mailer.send_email(sender, password, receivers, cc, bcc, subject, body, attachment)
-            database.save_email(sender, receivers, subject, body, cc, bcc, filename=attachment)
+                # Send the email and save it to the database only if successful
+                mailer.send_email(sender, password, receivers, cc, bcc, subject, body, attachment)
+                database.save_email(sender, receivers, subject, body, cc, bcc, filename=attachment)
+                
+            except smtplib.SMTPAuthenticationError:
+                # This error is already handled in mailer.py with a detailed message
+                print(f"{Colors.RED}Email was not sent. Please check the error message above.{Colors.END}\n")
+                continue
+            except FileNotFoundError as e:
+                print(f"{Colors.RED}Error: Attachment file not found: {e}{Colors.END}\n")
+                continue
+            except Exception as e:
+                # Catch any other unexpected errors
+                print(f"{Colors.RED}Unexpected error: {e}{Colors.END}\n")
+                continue
 
         elif choice == "5":
             # check if user is logged in
