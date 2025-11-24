@@ -81,18 +81,19 @@ def main():
             # Retrieve and display all sent emails from the database
             emails = database.get_all_emails()
             for email in emails:
+                if email.sender == auth.current_user.email:
 
-                print()
-                print("-" * 100)
-                print(f"ID:       {email.id}")
-                print(f"Sender:   {email.sender}")
-                print(f"Receiver: {email.receiver}")
-                print(f"CC:       {email.cc}")
-                print(f"BCC:      {email.bcc}")
-                print(f"Subject:  {email.subject}")
-                print(f"Status:   {email.status}")
-                print(f"Body:     {email.body}")
-                print("-" * 100)
+                    print()
+                    print("-" * 100)
+                    print(f"ID:       {email.id}")
+                    print(f"Sender:   {email.sender}")
+                    print(f"Receiver: {email.receiver}")
+                    print(f"CC:       {email.cc}")
+                    print(f"BCC:      {email.bcc}")
+                    print(f"Subject:  {email.subject}")
+                    print(f"Status:   {email.status}")
+                    print(f"Body:     {email.body}")
+                    print("-" * 100)
 
         elif choice == "6":
             # check if user is logged in
@@ -104,7 +105,7 @@ def main():
             try:
                 email_id = int(input("Enter the email ID to view: "))
                 email = database.get_email_by_id(email_id)
-                if email:
+                if email and email.sender == auth.current_user.email:
                     print()
                     print("-" * 100)
                     print(f"ID:       {email.id}")
